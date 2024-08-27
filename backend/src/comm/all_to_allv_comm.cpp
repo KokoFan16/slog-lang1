@@ -194,10 +194,10 @@ int twophase_rbruck_alltoallv(int r, char *sendbuf, int *sendcounts, int *sdispl
 		rotate_index_array[i] = (2*rank-i+nprocs)%nprocs;
 
 	// 3. exchange data with log(P) steps
-	char* extra_buffer = (char*) malloc(max_send_count*typesize*nprocs);
-	char* temp_send_buffer = (char*) malloc(max_send_count*typesize*nlpow);
-	char* temp_recv_buffer = (char*) malloc(max_send_count*typesize*nlpow);
-	memset(pos_status, 0, nprocs*sizeof(int));
+//	char* extra_buffer = (char*) malloc(max_send_count*typesize*nprocs);
+//	char* temp_send_buffer = (char*) malloc(max_send_count*typesize*nlpow);
+//	char* temp_recv_buffer = (char*) malloc(max_send_count*typesize*nlpow);
+//	memset(pos_status, 0, nprocs*sizeof(int));
 
 //	int sent_blocks[nlpow];
 //	int di = 0, spoint = 1, distance = myPow(r, w-1), next_distance = distance*r;
@@ -266,9 +266,9 @@ int twophase_rbruck_alltoallv(int r, char *sendbuf, int *sendcounts, int *sdispl
 //	memcpy(&recvbuf[rdispls[rank]*typesize], &sendcopy[sdispls[rank]*typesize], recvcounts[rank]*typesize);
 
 	free(sendcopy);
-	free(temp_send_buffer);
-	free(temp_recv_buffer);
-	free(extra_buffer);
+//	free(temp_send_buffer);
+//	free(temp_recv_buffer);
+//	free(extra_buffer);
 
 	return 0;
 }
