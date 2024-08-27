@@ -194,7 +194,7 @@ int twophase_rbruck_alltoallv(int r, char *sendbuf, int *sendcounts, int *sdispl
 	for (int i = 0; i < nprocs; i++)
 		rotate_index_array[i] = (2*rank-i+nprocs)%nprocs;
 
-	 3. exchange data with log(P) steps
+//	 3. exchange data with log(P) steps
 	char* extra_buffer = (char*) malloc(max_send_count*typesize*nprocs);
 	char* temp_send_buffer = (char*) malloc(max_send_count*typesize*nlpow);
 	char* temp_recv_buffer = (char*) malloc(max_send_count*typesize*nlpow);
