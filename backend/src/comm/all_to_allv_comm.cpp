@@ -16,9 +16,9 @@ void all_to_all_comm(vector_buffer* vectorized_send_buffer, int vectorized_send_
     int rank;
     MPI_Comm_rank(comm, &rank);
 
-    if (rank == 0) {
-        std::cout << "using all_to_all_comm" << std::endl;
-    }
+//    if (rank == 0) {
+//        std::cout << "using all_to_all_comm" << std::endl;
+//    }
 
     /// send_counts ----> recv_counts
     int* recv_counts = new int[nprocs];
