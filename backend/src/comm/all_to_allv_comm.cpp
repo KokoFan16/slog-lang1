@@ -56,7 +56,8 @@ void all_to_all_comm(vector_buffer* vectorized_send_buffer, int vectorized_send_
     int r = ceil(sqrt(nprocs));
     twophase_rbruck_alltoallv(r, (char*)send_buffer, send_counts, send_displacements, MPI_UNSIGNED_LONG_LONG, (char*)*recv_buffer, recv_counts, recv_displacements, MPI_UNSIGNED_LONG_LONG, comm);
 //    MPI_Alltoallv(send_buffer, send_counts, send_displacements, MPI_UNSIGNED_LONG_LONG, *recv_buffer, recv_counts, recv_displacements, MPI_UNSIGNED_LONG_LONG, comm);
-
+    if (rank == 0)
+    	std::cout << "complete twophase_rbruck_alltoallv" << std::endl;
     /// cleanup
     delete[] recv_counts;
     delete[] recv_displacements;
