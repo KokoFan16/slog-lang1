@@ -16,10 +16,6 @@ void all_to_all_comm(vector_buffer* vectorized_send_buffer, int vectorized_send_
     int rank;
     MPI_Comm_rank(comm, &rank);
 
-//    if (rank == 0) {
-//        std::cout << "using all_to_all_comm" << std::endl;
-//    }
-
     /// send_counts ----> recv_counts
     int* recv_counts = new int[nprocs];
     memset(recv_counts, 0, nprocs * sizeof(int));
@@ -75,10 +71,6 @@ void comm_compaction_all_to_all(all_to_allv_buffer compute_buffer, int **recv_bu
     int nprocs = compute_buffer.nprocs;
     int rank;
     MPI_Comm_rank(comm, &rank);
-
-    if (rank == 0) {
-        std::cout << "using comm_compaction_all_to_all" << std::endl;
-    }
 
     *recv_buffer_counts = new int[RA_count * nprocs];
     memset(*recv_buffer_counts, 0, RA_count * nprocs * sizeof(int));
@@ -145,3 +137,6 @@ void comm_compaction_all_to_all(all_to_allv_buffer compute_buffer, int **recv_bu
     delete[] recv_displacements;
     delete[] recv_counts;
 }
+
+
+
