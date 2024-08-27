@@ -189,6 +189,8 @@ int twophase_rbruck_alltoallv(int r, char *sendbuf, int *sendcounts, int *sdispl
 	}
 	MPI_Allreduce(&r, &max_send_count, 1, MPI_INT, MPI_MAX, comm);
 	memcpy(sendNcopy, sendcounts, nprocs*sizeof(int));
+	if (rank == 0)
+		std::cout << max_send_count << std::endl;
 
     // 2. create local index array after rotation
 	for (int i = 0; i < nprocs; i++)
@@ -200,71 +202,71 @@ int twophase_rbruck_alltoallv(int r, char *sendbuf, int *sendcounts, int *sdispl
 	char* temp_recv_buffer = (char*) malloc(max_send_count*typesize*nlpow);
 	memset(pos_status, 0, nprocs*sizeof(int));
 
-	int sent_blocks[nlpow];
-	int di = 0, spoint = 1, distance = myPow(r, w-1), next_distance = distance*r;
-
-	for (int x = w-1; x > -1; x--) {
-		int ze = (x == w - 1)? r - d: r;
-		for (int z = ze-1; z > 0; z--) {
-
-			// 1) get the sent data-blocks
-			di = 0;
-			spoint = z * distance;
-			for (int i = spoint; i < nprocs; i += next_distance) {
-				for (int j = i; j < (i+distance); j++) {
-					if (j > nprocs - 1 ) { break; }
-					int id = (j + rank) % nprocs;
-					sent_blocks[di++] = id;
-				}
-			}
-
-			// 2) prepare metadata and send buffer
-			int metadata_send[di];
-			int sendCount = 0, offset = 0;
-			for (int i = 0; i < di; i++) {
-				int send_index = rotate_index_array[sent_blocks[i]];
-				metadata_send[i] = sendNcopy[send_index];
-				if (pos_status[send_index] == 0)
-					memcpy(&temp_send_buffer[offset], &sendbuf[sdispls[send_index]*typesize], sendNcopy[send_index]*typesize);
-				else
-					memcpy(&temp_send_buffer[offset], &extra_buffer[sent_blocks[i]*max_send_count*typesize], sendNcopy[send_index]*typesize);
-				offset += sendNcopy[send_index]*typesize;
-			}
-
-			// 3) exchange metadata
-			int recvrank = (rank + spoint) % nprocs; // receive data from rank - 2^step process
-			int sendrank = (rank - spoint + nprocs) % nprocs; // send data from rank + 2^k process
-
-			int metadata_recv[di];
-			MPI_Sendrecv(metadata_send, di, MPI_INT, sendrank, 0, metadata_recv, di, MPI_INT, recvrank, 0, comm, MPI_STATUS_IGNORE);
-
-			for(int i = 0; i < di; i++)
-				sendCount += metadata_recv[i];
-
-			// 4) exchange data
-			MPI_Sendrecv(temp_send_buffer, offset, MPI_CHAR, sendrank, 1, temp_recv_buffer, sendCount*typesize, MPI_CHAR, recvrank, 1, comm, MPI_STATUS_IGNORE);
-
-			// 5) replaces
-			offset = 0;
-			for (int i = 0; i < di; i++) {
-				int send_index = rotate_index_array[sent_blocks[i]];
-
-				int origin_index = (sent_blocks[i] - rank + nprocs) % nprocs;
-				if (origin_index % next_distance == (recvrank - rank + nprocs) % nprocs)
-					memcpy(&recvbuf[rdispls[sent_blocks[i]]*typesize], &temp_recv_buffer[offset], metadata_recv[i]*typesize);
-				else
-					memcpy(&extra_buffer[sent_blocks[i]*max_send_count*typesize], &temp_recv_buffer[offset], metadata_recv[i]*typesize);
-
-				offset += metadata_recv[i]*typesize;
-				pos_status[send_index] = 1;
-				sendNcopy[send_index] = metadata_recv[i];
-			}
-		}
-		distance /= r;
-		next_distance /= r;
-	}
-
-	memcpy(&recvbuf[rdispls[rank]*typesize], &sendbuf[sdispls[rank]*typesize], recvcounts[rank]*typesize);
+//	int sent_blocks[nlpow];
+//	int di = 0, spoint = 1, distance = myPow(r, w-1), next_distance = distance*r;
+//
+//	for (int x = w-1; x > -1; x--) {
+//		int ze = (x == w - 1)? r - d: r;
+//		for (int z = ze-1; z > 0; z--) {
+//
+//			// 1) get the sent data-blocks
+//			di = 0;
+//			spoint = z * distance;
+//			for (int i = spoint; i < nprocs; i += next_distance) {
+//				for (int j = i; j < (i+distance); j++) {
+//					if (j > nprocs - 1 ) { break; }
+//					int id = (j + rank) % nprocs;
+//					sent_blocks[di++] = id;
+//				}
+//			}
+//
+//			// 2) prepare metadata and send buffer
+//			int metadata_send[di];
+//			int sendCount = 0, offset = 0;
+//			for (int i = 0; i < di; i++) {
+//				int send_index = rotate_index_array[sent_blocks[i]];
+//				metadata_send[i] = sendNcopy[send_index];
+//				if (pos_status[send_index] == 0)
+//					memcpy(&temp_send_buffer[offset], &sendbuf[sdispls[send_index]*typesize], sendNcopy[send_index]*typesize);
+//				else
+//					memcpy(&temp_send_buffer[offset], &extra_buffer[sent_blocks[i]*max_send_count*typesize], sendNcopy[send_index]*typesize);
+//				offset += sendNcopy[send_index]*typesize;
+//			}
+//
+//			// 3) exchange metadata
+//			int recvrank = (rank + spoint) % nprocs; // receive data from rank - 2^step process
+//			int sendrank = (rank - spoint + nprocs) % nprocs; // send data from rank + 2^k process
+//
+//			int metadata_recv[di];
+//			MPI_Sendrecv(metadata_send, di, MPI_INT, sendrank, 0, metadata_recv, di, MPI_INT, recvrank, 0, comm, MPI_STATUS_IGNORE);
+//
+//			for(int i = 0; i < di; i++)
+//				sendCount += metadata_recv[i];
+//
+//			// 4) exchange data
+//			MPI_Sendrecv(temp_send_buffer, offset, MPI_CHAR, sendrank, 1, temp_recv_buffer, sendCount*typesize, MPI_CHAR, recvrank, 1, comm, MPI_STATUS_IGNORE);
+//
+//			// 5) replaces
+//			offset = 0;
+//			for (int i = 0; i < di; i++) {
+//				int send_index = rotate_index_array[sent_blocks[i]];
+//
+//				int origin_index = (sent_blocks[i] - rank + nprocs) % nprocs;
+//				if (origin_index % next_distance == (recvrank - rank + nprocs) % nprocs)
+//					memcpy(&recvbuf[rdispls[sent_blocks[i]]*typesize], &temp_recv_buffer[offset], metadata_recv[i]*typesize);
+//				else
+//					memcpy(&extra_buffer[sent_blocks[i]*max_send_count*typesize], &temp_recv_buffer[offset], metadata_recv[i]*typesize);
+//
+//				offset += metadata_recv[i]*typesize;
+//				pos_status[send_index] = 1;
+//				sendNcopy[send_index] = metadata_recv[i];
+//			}
+//		}
+//		distance /= r;
+//		next_distance /= r;
+//	}
+//
+//	memcpy(&recvbuf[rdispls[rank]*typesize], &sendbuf[sdispls[rank]*typesize], recvcounts[rank]*typesize);
 
 //	free(sendcopy);
 	free(temp_send_buffer);
