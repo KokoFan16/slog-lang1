@@ -163,36 +163,36 @@ int twophase_rbruck_alltoallv(int r, char *sendbuf, int *sendcounts, int *sdispl
 
 	if ( r > nprocs ) { r = nprocs; }
 
-	char* sendcopy;
-	if (!sendbuf) {
-		int total_count = 0;
-		for (int i = 0; i < nprocs; i++) { total_count += sendcounts[i]; }
-		sendcopy = (char*) malloc(total_count*typesize);
-		memcpy(sendcopy, recvbuf, total_count*typesize);
-	}
-	else { sendcopy = sendbuf; }
-
-	int w, nlpow, d;
-	int local_max_count=0, max_send_count=0;
-	int sendNcopy[nprocs], rotate_index_array[nprocs], pos_status[nprocs];
-
-	MPI_Type_size(sendtype, &typesize);
-
-	w = ceil(log(nprocs) / log(r)); // calculate the number of digits when using r-representation
-	nlpow = myPow(r, w-1); // maximum send number of elements
-	d = (myPow(r, w) - nprocs) / nlpow; // calculate the number of highest digits
-
-	// 1. Find max send count
-	for (int i = 0; i < nprocs; i++) {
-		if (sendcounts[i] > local_max_count)
-			local_max_count = sendcounts[i];
-	}
-	MPI_Allreduce(&r, &max_send_count, 1, MPI_INT, MPI_MAX, comm);
-	memcpy(sendNcopy, sendcounts, nprocs*sizeof(int));
-
-    // 2. create local index array after rotation
-	for (int i = 0; i < nprocs; i++)
-		rotate_index_array[i] = (2*rank-i+nprocs)%nprocs;
+//	char* sendcopy;
+//	if (!sendbuf) {
+//		int total_count = 0;
+//		for (int i = 0; i < nprocs; i++) { total_count += sendcounts[i]; }
+//		sendcopy = (char*) malloc(total_count*typesize);
+//		memcpy(sendcopy, recvbuf, total_count*typesize);
+//	}
+//	else { sendcopy = sendbuf; }
+//
+//	int w, nlpow, d;
+//	int local_max_count=0, max_send_count=0;
+//	int sendNcopy[nprocs], rotate_index_array[nprocs], pos_status[nprocs];
+//
+//	MPI_Type_size(sendtype, &typesize);
+//
+//	w = ceil(log(nprocs) / log(r)); // calculate the number of digits when using r-representation
+//	nlpow = myPow(r, w-1); // maximum send number of elements
+//	d = (myPow(r, w) - nprocs) / nlpow; // calculate the number of highest digits
+//
+//	// 1. Find max send count
+//	for (int i = 0; i < nprocs; i++) {
+//		if (sendcounts[i] > local_max_count)
+//			local_max_count = sendcounts[i];
+//	}
+//	MPI_Allreduce(&r, &max_send_count, 1, MPI_INT, MPI_MAX, comm);
+//	memcpy(sendNcopy, sendcounts, nprocs*sizeof(int));
+//
+//    // 2. create local index array after rotation
+//	for (int i = 0; i < nprocs; i++)
+//		rotate_index_array[i] = (2*rank-i+nprocs)%nprocs;
 
 	// 3. exchange data with log(P) steps
 //	char* extra_buffer = (char*) malloc(max_send_count*typesize*nprocs);
@@ -266,7 +266,7 @@ int twophase_rbruck_alltoallv(int r, char *sendbuf, int *sendcounts, int *sdispl
 //
 //	memcpy(&recvbuf[rdispls[rank]*typesize], &sendcopy[sdispls[rank]*typesize], recvcounts[rank]*typesize);
 
-	free(sendcopy);
+//	free(sendcopy);
 //	free(temp_send_buffer);
 //	free(temp_recv_buffer);
 //	free(extra_buffer);
