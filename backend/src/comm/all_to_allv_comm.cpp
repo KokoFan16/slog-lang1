@@ -251,7 +251,7 @@ int twophase_rbruck_alltoallv(int r, char *sendbuf, int *sendcounts, int *sdispl
 //				offset += metadata_recv[i]*typesize;
 //				pos_status[send_index] = 1;
 //				sendNcopy[send_index] = metadata_recv[i];
-			}
+//			}
 		}
 		distance /= r;
 		next_distance /= r;
