@@ -211,19 +211,19 @@ int twophase_rbruck_alltoallv(int r, char *sendbuf, int *sendcounts, int *sdispl
 				}
 			}
 
-//			// 2) prepare metadata and send buffer
-//			int metadata_send[di];
-//			int sendCount = 0, offset = 0;
-//			for (int i = 0; i < di; i++) {
-//				int send_index = rotate_index_array[sent_blocks[i]];
-//				metadata_send[i] = sendNcopy[send_index];
-//				if (pos_status[send_index] == 0)
-//					memcpy(&temp_send_buffer[offset], &sendbuf[sdispls[send_index]*typesize], sendNcopy[send_index]*typesize);
-//				else
-//					memcpy(&temp_send_buffer[offset], &extra_buffer[sent_blocks[i]*max_send_count*typesize], sendNcopy[send_index]*typesize);
-//				offset += sendNcopy[send_index]*typesize;
-//			}
-//
+			// 2) prepare metadata and send buffer
+			int metadata_send[di];
+			int sendCount = 0, offset = 0;
+			for (int i = 0; i < di; i++) {
+				int send_index = rotate_index_array[sent_blocks[i]];
+				metadata_send[i] = sendNcopy[send_index];
+				if (pos_status[send_index] == 0)
+					memcpy(&temp_send_buffer[offset], &sendbuf[sdispls[send_index]*typesize], sendNcopy[send_index]*typesize);
+				else
+					memcpy(&temp_send_buffer[offset], &extra_buffer[sent_blocks[i]*max_send_count*typesize], sendNcopy[send_index]*typesize);
+				offset += sendNcopy[send_index]*typesize;
+			}
+
 //			// 3) exchange metadata
 //			int recvrank = (rank + spoint) % nprocs; // receive data from rank - 2^step process
 //			int sendrank = (rank - spoint + nprocs) % nprocs; // send data from rank + 2^k process
