@@ -231,11 +231,11 @@ int twophase_rbruck_alltoallv(int r, char *sendbuf, int *sendcounts, int *sdispl
 			int metadata_recv[di];
 			MPI_Sendrecv(metadata_send, di, MPI_INT, sendrank, 0, metadata_recv, di, MPI_INT, recvrank, 0, comm, MPI_STATUS_IGNORE);
 
-			for(int i = 0; i < di; i++)
-				sendCount += metadata_recv[i];
-
-			// 4) exchange data
-			MPI_Sendrecv(temp_send_buffer, offset, MPI_CHAR, sendrank, 1, temp_recv_buffer, sendCount*typesize, MPI_CHAR, recvrank, 1, comm, MPI_STATUS_IGNORE);
+//			for(int i = 0; i < di; i++)
+//				sendCount += metadata_recv[i];
+//
+//			// 4) exchange data
+//			MPI_Sendrecv(temp_send_buffer, offset, MPI_CHAR, sendrank, 1, temp_recv_buffer, sendCount*typesize, MPI_CHAR, recvrank, 1, comm, MPI_STATUS_IGNORE);
 
 //			// 5) replaces
 //			offset = 0;
