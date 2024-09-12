@@ -181,20 +181,12 @@ int twophase_rbruck_alltoallv(int r, char *sendbuf, int *sendcounts, int *sdispl
 	MPI_Allreduce(&local_max_count, &max_send_count, 1, MPI_INT, MPI_MAX, comm);
 	memcpy(sendNcopy, sendcounts, nprocs*sizeof(int));
 
-//
-//	if (rank == 0) {
-//		for (int i = 0; i < nprocs; i++) {
-//			std::cout << sendcounts[i] << " " << sendNcopy[i] << std::endl;
-//		}
-//	}
-//	if (rank == 0)
-//		std::cout << max_send_count << std::endl;
 
     // 2. create local index array after rotation
 	for (int i = 0; i < nprocs; i++)
 		rotate_index_array[i] = (2*rank-i+nprocs)%nprocs;
 
-//	 3. exchange data with log(P) steps
+	// 3. exchange data with log(P) steps
 	char* extra_buffer = (char*) malloc(max_send_count*typesize*nprocs);
 	char* temp_send_buffer = (char*) malloc(max_send_count*typesize*nlpow);
 	char* temp_recv_buffer = (char*) malloc(max_send_count*typesize*nlpow);
@@ -241,37 +233,35 @@ int twophase_rbruck_alltoallv(int r, char *sendbuf, int *sendcounts, int *sdispl
 			for(int i = 0; i < di; i++)
 				sendCount += metadata_recv[i];
 
-//			std::cout << rank << " " << max_send_count << " " << nlpow << " " << offset << " " << sendCount << " " << typesize << std::endl;
-
 			// 4) exchange data
 			MPI_Sendrecv(temp_send_buffer, offset, MPI_CHAR, sendrank, 1, temp_recv_buffer, sendCount*typesize, MPI_CHAR, recvrank, 1, comm, MPI_STATUS_IGNORE);
 
-//			// 5) replaces
-//			offset = 0;
-//			for (int i = 0; i < di; i++) {
-//				int send_index = rotate_index_array[sent_blocks[i]];
-//
-//				int origin_index = (sent_blocks[i] - rank + nprocs) % nprocs;
-//				if (origin_index % next_distance == (recvrank - rank + nprocs) % nprocs)
-//					memcpy(&recvbuf[rdispls[sent_blocks[i]]*typesize], &temp_recv_buffer[offset], metadata_recv[i]*typesize);
-//				else
-//					memcpy(&extra_buffer[sent_blocks[i]*max_send_count*typesize], &temp_recv_buffer[offset], metadata_recv[i]*typesize);
-//
-//				offset += metadata_recv[i]*typesize;
-//				pos_status[send_index] = 1;
-//				sendNcopy[send_index] = metadata_recv[i];
-//			}
+			// 5) replaces
+			offset = 0;
+			for (int i = 0; i < di; i++) {
+				int send_index = rotate_index_array[sent_blocks[i]];
+
+				int origin_index = (sent_blocks[i] - rank + nprocs) % nprocs;
+				if (origin_index % next_distance == (recvrank - rank + nprocs) % nprocs)
+					memcpy(&recvbuf[rdispls[sent_blocks[i]]*typesize], &temp_recv_buffer[offset], metadata_recv[i]*typesize);
+				else
+					memcpy(&extra_buffer[sent_blocks[i]*max_send_count*typesize], &temp_recv_buffer[offset], metadata_recv[i]*typesize);
+
+				offset += metadata_recv[i]*typesize;
+				pos_status[send_index] = 1;
+				sendNcopy[send_index] = metadata_recv[i];
+			}
 		}
 		distance /= r;
 		next_distance /= r;
 	}
-//
-//	memcpy(&recvbuf[rdispls[rank]*typesize], &sendbuf[sdispls[rank]*typesize], recvcounts[rank]*typesize);
 
-//	free(sendcopy);
-//	free(temp_send_buffer);
-//	free(temp_recv_buffer);
-//	free(extra_buffer);
+	memcpy(&recvbuf[rdispls[rank]*typesize], &sendbuf[sdispls[rank]*typesize], recvcounts[rank]*typesize);
+
+	free(sendcopy);
+	free(temp_send_buffer);
+	free(temp_recv_buffer);
+	free(extra_buffer);
 
 	return 0;
 }
