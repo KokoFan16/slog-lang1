@@ -178,15 +178,15 @@ int twophase_rbruck_alltoallv(int r, char *sendbuf, int *sendcounts, int *sdispl
 		if (sendcounts[i] > local_max_count)
 			local_max_count = sendcounts[i];
 	}
-	MPI_Allreduce(&r, &max_send_count, 1, MPI_INT, MPI_MAX, comm);
+	MPI_Allreduce(&local_max_count, &max_send_count, 1, MPI_INT, MPI_MAX, comm);
 	memcpy(sendNcopy, sendcounts, nprocs*sizeof(int));
 
-
-	if (rank == 0) {
-		for (int i = 0; i < nprocs; i++) {
-			std::cout << sendcounts[i] << " " << sendNcopy[i] << std::endl;
-		}
-	}
+//
+//	if (rank == 0) {
+//		for (int i = 0; i < nprocs; i++) {
+//			std::cout << sendcounts[i] << " " << sendNcopy[i] << std::endl;
+//		}
+//	}
 //	if (rank == 0)
 //		std::cout << max_send_count << std::endl;
 
@@ -241,7 +241,7 @@ int twophase_rbruck_alltoallv(int r, char *sendbuf, int *sendcounts, int *sdispl
 			for(int i = 0; i < di; i++)
 				sendCount += metadata_recv[i];
 
-//			std::cout << rank << " " << max_send_count << " " << nlpow << " " << offset << " " << sendCount << " " << typesize << std::endl;
+			std::cout << rank << " " << max_send_count << " " << nlpow << " " << offset << " " << sendCount << " " << typesize << std::endl;
 
 			// 4) exchange data
 //			MPI_Sendrecv(temp_send_buffer, offset, MPI_CHAR, sendrank, 1, temp_recv_buffer, sendCount*typesize, MPI_CHAR, recvrank, 1, comm, MPI_STATUS_IGNORE);
