@@ -258,7 +258,6 @@ int twophase_rbruck_alltoallv(int r, char *sendbuf, int *sendcounts, int *sdispl
 
 	memcpy(&recvbuf[rdispls[rank]*typesize], &sendbuf[sdispls[rank]*typesize], recvcounts[rank]*typesize);
 
-	free(sendcopy);
 	free(temp_send_buffer);
 	free(temp_recv_buffer);
 	free(extra_buffer);
