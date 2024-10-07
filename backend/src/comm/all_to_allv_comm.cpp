@@ -81,7 +81,7 @@ void comm_compaction_all_to_all(all_to_allv_buffer compute_buffer, int **recv_bu
     int rank;
     MPI_Comm_rank(comm, &rank);
 
-    int r = ceil(sqrt(nprocs));
+    int r = 32;
     int n = 32;
     int b = 64;
 
