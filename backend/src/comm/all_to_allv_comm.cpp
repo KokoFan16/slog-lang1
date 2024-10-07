@@ -73,7 +73,8 @@ void comm_compaction_all_to_all(all_to_allv_buffer compute_buffer, int **recv_bu
 {
     u32 RA_count = compute_buffer.ra_count;
     int nprocs = compute_buffer.nprocs;
-    int r = ceil(sqrt(nprocs));
+//    int r = ceil(sqrt(nprocs));
+    int r = 32;
 
     *recv_buffer_counts = new int[RA_count * nprocs];
     memset(*recv_buffer_counts, 0, RA_count * nprocs * sizeof(int));
